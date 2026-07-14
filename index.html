@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI拍摄 · try-on 视觉模板库</title>
+<style>
+:root{
+  --bg:#f5f6f8; --panel:#ffffff; --ink:#1d2330; --sub:#6b7280; --line:#e6e9ef;
+  --brand:#2f4878; --brand-soft:#eef2fb; --accent:#a8506f; --ok:#1f9d6b;
+  --chip:#f0f2f6; --shadow:0 1px 3px rgba(20,30,60,.08),0 6px 18px rgba(20,30,60,.06);
+  --cat-男装:#2f487a; --cat-女装:#a84f78; --cat-运动:#267a62; --cat-童装:#c98e33;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"PingFang SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+  background:var(--bg);color:var(--ink);font-size:14px}
+a{color:inherit}
+header{position:sticky;top:0;z-index:30;background:var(--panel);border-bottom:1px solid var(--line);
+  padding:10px 18px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.logo{font-weight:700;font-size:17px;letter-spacing:.5px;color:var(--brand);white-space:nowrap}
+.logo small{font-weight:400;color:var(--sub);font-size:12px;margin-left:6px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{padding:6px 14px;border-radius:20px;cursor:pointer;border:1px solid var(--line);background:#fff;
+  font-weight:600;color:var(--sub);transition:.15s;user-select:none}
+.tab .c{font-weight:400;opacity:.7;margin-left:4px;font-size:12px}
+.tab:hover{border-color:var(--brand)}
+.tab.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.search{margin-left:auto;display:flex;align-items:center;gap:8px}
+.search input{border:1px solid var(--line);border-radius:8px;padding:7px 12px;width:220px;font-size:13px;outline:none}
+.search input:focus{border-color:var(--brand)}
+.layout{display:flex;align-items:flex-start;gap:0}
+aside{width:248px;flex:none;background:var(--panel);border-right:1px solid var(--line);
+  height:calc(100vh - 53px);overflow-y:auto;position:sticky;top:53px;padding:14px 14px 40px}
+main{flex:1;min-width:0;padding:16px 20px 60px}
+.scope{display:flex;gap:6px;margin-bottom:14px}
+.scope div{flex:1;text-align:center;padding:7px 0;border:1px solid var(--line);border-radius:8px;
+  cursor:pointer;font-size:12.5px;color:var(--sub);font-weight:600}
+.scope div.on{background:var(--brand-soft);border-color:var(--brand);color:var(--brand)}
+.fgroup{border-top:1px solid var(--line);padding:10px 0}
+.fgroup:first-of-type{border-top:none}
+.fhead{display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-weight:700;
+  font-size:13px;padding:2px 0;user-select:none}
+.fhead .arrow{color:var(--sub);transition:.2s;font-size:11px}
+.fhead.col .arrow{transform:rotate(-90deg)}
+.opts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.opt{padding:4px 10px;border-radius:14px;background:var(--chip);cursor:pointer;font-size:12px;
+  border:1px solid transparent;color:#42495a}
+.opt:hover{border-color:var(--brand)}
+.opt.on{background:var(--brand);color:#fff}
+.sec-label{font-size:11px;color:var(--sub);text-transform:uppercase;letter-spacing:.6px;margin:16px 0 4px}
+.toolbar{display:flex;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap}
+.stat{color:var(--sub);font-size:13px}
+.stat b{color:var(--ink)}
+.spacer{margin-left:auto}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg div{padding:6px 12px;cursor:pointer;font-size:12.5px;color:var(--sub);font-weight:600;background:#fff}
+.seg div.on{background:var(--brand);color:#fff}
+select{border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12.5px;background:#fff;outline:none}
+.btn-clear{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;
+  font-size:12.5px;color:var(--sub)}
+.btn-clear:hover{border-color:var(--accent);color:var(--accent)}
+
+/* grids */
+.grid{display:grid;gap:16px}
+.grid.agg{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.grid.tileG{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.grid.tileI{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;
+  box-shadow:var(--shadow);cursor:pointer;transition:.15s;display:flex;flex-direction:column}
+.card:hover{transform:translateY(-2px);box-shadow:0 4px 10px rgba(20,30,60,.1),0 14px 30px rgba(20,30,60,.1)}
+.thumb{position:relative;width:100%;aspect-ratio:3/4;background:#e9ecf2;overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.catflag{position:absolute;top:8px;left:8px;color:#fff;font-size:11px;font-weight:700;
+  padding:2px 8px;border-radius:10px;background:rgba(0,0,0,.45)}
+.badges{position:absolute;top:8px;right:8px;display:flex;gap:4px;flex-direction:column;align-items:flex-end}
+.badge{font-size:10.5px;font-weight:700;color:#fff;background:var(--accent);padding:2px 7px;border-radius:9px}
+.badge.main{background:#d98324}
+.badge.seed{background:var(--accent)}
+.mini{position:absolute;bottom:0;left:0;right:0;display:flex;gap:2px;padding:4px;
+  background:linear-gradient(transparent,rgba(0,0,0,.35))}
+.mini img{width:100%;height:34px;object-fit:cover;border-radius:3px}
+.cbody{padding:10px 12px 12px;display:flex;flex-direction:column;gap:7px;flex:1}
+.cname{font-weight:700;font-size:13.5px;line-height:1.3}
+.ctags{display:flex;flex-wrap:wrap;gap:4px}
+.t{font-size:11px;background:var(--brand-soft);color:var(--brand);padding:1px 7px;border-radius:8px}
+.t.g{background:#eaf6f0;color:var(--ok)}
+.cmeta{margin-top:auto;display:flex;gap:10px;font-size:11.5px;color:var(--sub);flex-wrap:wrap;
+  border-top:1px dashed var(--line);padding-top:7px}
+.cmeta b{color:var(--ink)}
+.tileI .cbody{padding:7px 8px 9px;gap:5px}
+.tileI .cname{font-size:12px}
+.empty{padding:60px 20px;text-align:center;color:var(--sub)}
+.empty .big{font-size:30px;margin-bottom:8px}
+
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(18,22,33,.78);z-index:50;display:none;
+  align-items:center;justify-content:center;padding:24px}
+.modal.show{display:flex}
+.mbox{background:var(--panel);border-radius:14px;max-width:1000px;width:100%;max-height:92vh;
+  display:flex;overflow:hidden}
+.mimg{flex:1;background:#11151f;display:flex;align-items:center;justify-content:center;position:relative;min-width:0}
+.mimg img{max-width:100%;max-height:92vh;object-fit:contain}
+.nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.16);color:#fff;
+  border:none;width:40px;height:54px;cursor:pointer;font-size:22px;border-radius:8px}
+.nav.prev{left:10px}.nav.next{right:10px}
+.nav:hover{background:rgba(255,255,255,.32)}
+.mside{width:312px;flex:none;padding:18px;overflow-y:auto;border-left:1px solid var(--line)}
+.mside h3{margin:0 0 4px;font-size:15px}
+.mside .grp{color:var(--sub);font-size:12px;margin-bottom:14px;cursor:pointer}
+.mside .grp:hover{color:var(--brand);text-decoration:underline}
+.row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+.row span:first-child{color:var(--sub)}
+.row span:last-child{font-weight:600;text-align:right}
+.row .na{color:#b6bcc8;font-weight:400}
+.mmetrics{margin-top:14px;background:var(--brand-soft);border-radius:10px;padding:10px 12px}
+.mmetrics .row{border-color:#dde6f6}
+.mact{display:flex;gap:8px;margin-top:14px}
+.mact button{flex:1;border:none;border-radius:8px;padding:9px 0;cursor:pointer;font-weight:600;font-size:12.5px}
+.copy{background:var(--brand);color:#fff}
+.close{background:#eef0f4;color:#444}
+.mclose{position:absolute;top:12px;right:12px;z-index:5;background:rgba(0,0,0,.45);color:#fff;border:none;
+  width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:17px}
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:#1d2330;color:#fff;
+  padding:10px 20px;border-radius:8px;font-size:13px;z-index:80;opacity:0;transition:.3s;pointer-events:none}
+.toast.show{opacity:1}
+.warn{background:#fff4e5;border:1px solid #ffd9a8;color:#9a5b00;padding:10px 14px;border-radius:10px;
+  margin-bottom:14px;font-size:12.5px;line-height:1.5}
+.hint{color:var(--sub);font-size:12.5px;line-height:1.6;background:var(--brand-soft);border-radius:8px;padding:10px 12px;margin-top:10px}
+.schemaTag{font-size:11px;color:var(--sub);margin-left:6px;font-weight:400}
+.addbtn{border:none;background:var(--brand);color:#fff;border-radius:8px;padding:7px 14px;font-weight:600;cursor:pointer;font-size:13px;white-space:nowrap}
+.addbtn:hover{background:#26406e}
+.up{max-width:1000px}
+.uphd{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.uphd h2{margin:0;font-size:18px}
+.uprow{display:flex;align-items:flex-start;gap:12px;margin:8px 0}
+.uprow>label{width:96px;flex:none;color:var(--sub);font-weight:600;padding-top:5px;font-size:13px}
+.uprow>label i{color:#b6bcc8;font-weight:400;font-style:normal;margin-left:4px;font-size:11px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.upname{font-size:14px;color:var(--brand)}
+.drop{border:2px dashed var(--line);border-radius:12px;padding:24px;text-align:center;color:var(--sub);background:#fafbfc;margin-top:4px}
+.drop.over{border-color:var(--brand);background:var(--brand-soft)}
+.pick{color:var(--brand);font-weight:600;cursor:pointer;text-decoration:underline}
+.uptools{margin:12px 0 8px;display:flex;gap:12px;align-items:center;font-size:12.5px}
+.upimgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:14px}
+.upcard{border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;position:relative}
+.upcard>img{width:100%;height:148px;object-fit:cover;border-radius:6px;margin-bottom:8px;background:#eee}
+.ilgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.il{font-size:11px;color:var(--sub);display:flex;flex-direction:column;gap:2px}
+.il select{font-size:12px;padding:3px;border:1px solid var(--line);border-radius:5px}
+.il select.bad{border-color:var(--accent);background:#fdeef2}
+.upcard .rm{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.5);color:#fff;font-size:11px;padding:2px 7px;border-radius:8px;cursor:pointer}
+.upsubmit{margin:18px 0;display:flex;align-items:center}
+.upsubmit button{border:none;border-radius:8px;padding:10px 24px;font-weight:700;font-size:14px;cursor:pointer;color:#fff;background:var(--ok)}
+.upsubmit button:disabled{background:#c4c9d2;cursor:not-allowed}
+.why{color:var(--sub);margin-left:12px;font-size:12.5px}
+@media(max-width:760px){aside{display:none}.mbox{flex-direction:column}.mside{width:100%}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">视觉模板库<small>AI拍摄 · try-on</small></div>
+  <div class="tabs" id="cats"></div>
+  <div class="search"><input id="kw" placeholder="搜图组名 / 场景…" oninput="onKw()">
+    <button class="addbtn" onclick="openUpload()">＋ 新增图组</button></div>
+</header>
+
+<div class="layout">
+  <aside id="panel"></aside>
+  <main>
+    <div id="warn"></div>
+    <div class="toolbar">
+      <div class="stat" id="stat"></div>
+      <div class="spacer"></div>
+      <div class="seg" id="viewSeg"></div>
+      <select id="sort" onchange="state.sort=this.value;render()">
+        <option value="hero">排序：首图优先</option>
+        <option value="ctr">排序：CTR 高→低</option>
+        <option value="prod">排序：生产次数 高→低</option>
+        <option value="name">排序：名称</option>
+      </select>
+      <button class="btn-clear" onclick="clearAll()">清空筛选</button>
+    </div>
+    <div id="results"></div>
+  </main>
+</div>
+
+<div class="modal" id="modal">
+  <div class="mbox">
+    <div class="mimg">
+      <button class="mclose" onclick="closeModal()">✕</button>
+      <button class="nav prev" onclick="step(-1)">‹</button>
+      <img id="mImg" src="" alt="">
+      <button class="nav next" onclick="step(1)">›</button>
+    </div>
+    <div class="mside" id="mSide"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="data/templates-data.js"></script>
+<script>
+const DB = window.TEMPLATE_DB || null;
+const $ = s => document.querySelector(s);
+
+const state = {
+  category:"全部", scope:"group",
+  gf:{}, imgf:{}, kw:"", view:"agg", sort:"hero",
+  collapsed:{}
+};
+
+if(!DB){
+  document.body.innerHTML='<div class="empty" style="padding:90px"><div class="big">⚠️</div>'+
+   '未找到数据文件 <code>data/templates-data.js</code>。<br>请先运行 <b>工具/rebuild_manifest.py</b> 生成清单。</div>';
+}else{ boot(); }
+
+/* 按类目取 schema：confirmed 用自身，否则回退通用 */
+function schemaFor(cat){
+  const s = DB.tag_dict.schemas[cat];
+  return (s && s.group_level && Object.keys(s.group_level).length) ? s : DB.tag_dict.schemas["通用"];
+}
+function activeSchema(){ return state.category==="全部" ? null : schemaFor(state.category); }
+function resetFilters(){
+  state.gf={}; state.imgf={};
+  const s=activeSchema(); if(!s) return;
+  Object.keys(s.group_level).forEach(k=>state.gf[k]=new Set());
+  Object.keys(s.image_level).forEach(k=>state.imgf[k]=new Set());
+}
+
+function boot(){
+  resetFilters();
+  const ls=document.querySelector(".logo small");
+  if(ls) ls.textContent="try-on · "+DB.meta.group_count+"组/"+DB.meta.image_count+"图 · 数据"+(DB.meta.generated_at||"").slice(5,16);
+  buildCats(); buildPanel(); buildViewSeg(); render();
+  if(DB.meta.image_count===0){
+    $("#warn").innerHTML='<div class="warn">当前是空库（仅含结构）。把图片放进 <b>templates/类目/图组名/</b>，在 <b>元数据录入模板.xlsx</b> 填标签，再运行 <b>工具/rebuild_manifest.py</b> 即可。</div>';
+  }
+}
+
+function count(cat){ return DB.groups.filter(g=>cat==="全部"||g.category===cat); }
+function buildCats(){
+  const cats=["全部",...DB.meta.categories];
+  $("#cats").innerHTML=cats.map(c=>{
+    const n=count(c).length;
+    return `<div class="tab ${c===state.category?'on':''}" onclick="setCat('${c}')">${c}<span class="c">${n}</span></div>`;
+  }).join("");
+}
+function setCat(c){state.category=c;state.kw="";if($("#kw"))$("#kw").value="";resetFilters();buildCats();buildPanel();render();}
+
+function buildPanel(){
+  const s=activeSchema();
+  let h='<div class="scope">'+
+    [["group","仅图组"],["image","仅图片"],["mixed","混合"]].map(([v,t])=>
+      `<div class="${state.scope===v?'on':''}" onclick="setScope('${v}')">${t}</div>`).join("")+'</div>';
+  if(!s){
+    h+='<div class="hint">选择上方某个具体类目，即可按该类目的标签维度筛选。<br>不同类目的维度不同（如<b>童装</b>有年龄段/性别/表情）。</div>';
+    $("#panel").innerHTML=h; return;
+  }
+  const isKid=state.category==="童装";
+  h+=`<div class="sec-label">图组级标签<span class="schemaTag">${isKid?'童装专属':'通用·待定义'}</span></div>`;
+  for(const k in s.group_level) h+=fblock("g",k,s.group_level[k]);
+  if(state.scope!=="group"){
+    h+='<div class="sec-label">图片级标签</div>';
+    for(const k in s.image_level) h+=fblock("i",k,s.image_level[k]);
+  }
+  $("#panel").innerHTML=h;
+}
+function fblock(scope,key,meta){
+  const id=scope+":"+key, col=state.collapsed[id]?'col':'';
+  const sel=(scope==="g"?state.gf:state.imgf)[key];
+  const opts=meta.values.map(v=>{
+    const on=sel.has(v)?'on':'';
+    return `<div class="opt ${on}" onclick="toggleOpt('${scope}','${key}','${v}')">${v}</div>`;
+  }).join("");
+  const dot=sel.size?` <span style="color:var(--brand)">(${sel.size})</span>`:"";
+  return `<div class="fgroup"><div class="fhead ${col}" onclick="colToggle('${id}')">
+    <span>${meta.label}${dot}</span><span class="arrow">▾</span></div>
+    <div class="opts" style="${col?'display:none':''}">${opts}</div></div>`;
+}
+function colToggle(id){state.collapsed[id]=!state.collapsed[id];buildPanel();}
+function setScope(v){state.scope=v;if(v==="image"){state.view="tile";}buildPanel();buildViewSeg();render();}
+function toggleOpt(scope,key,v){
+  const s=(scope==="g"?state.gf:state.imgf)[key];
+  s.has(v)?s.delete(v):s.add(v); buildPanel(); render();
+}
+function onKw(){state.kw=$("#kw").value.trim();render();}
+function clearAll(){
+  for(const k in state.gf)state.gf[k].clear();
+  for(const k in state.imgf)state.imgf[k].clear();
+  state.kw="";$("#kw").value="";buildPanel();render();
+}
+
+function buildViewSeg(){
+  if(state.scope==="image"){ $("#viewSeg").innerHTML=`<div class="on">平铺</div>`; state.view="tile"; return;}
+  $("#viewSeg").innerHTML=
+    `<div class="${state.view==='agg'?'on':''}" onclick="setView('agg')">聚合</div>`+
+    `<div class="${state.view==='tile'?'on':''}" onclick="setView('tile')">平铺</div>`;
+}
+function setView(v){state.view=v;buildViewSeg();render();}
+
+/* ---- filtering ---- */
+function groupHit(g){
+  if(state.category!=="全部" && g.category!==state.category) return false;
+  if(state.kw){
+    const s=(g.name+" "+(g.scene_desc||"")+" "+(g.model_name||"")).toLowerCase();
+    if(!s.includes(state.kw.toLowerCase())) return false;
+  }
+  for(const k in state.gf){
+    const sel=state.gf[k]; if(!sel.size) continue;
+    let tv=g.tags[k]; if(tv==null)tv=[]; if(!Array.isArray(tv))tv=[tv];
+    if(![...sel].some(v=>tv.includes(v))) return false;
+  }
+  return true;
+}
+function imgHit(im){
+  for(const k in state.imgf){
+    const sel=state.imgf[k]; if(!sel.size) continue;
+    if(!sel.has(im.tags[k])) return false;
+  }
+  return true;
+}
+function anyImgFilter(){ return Object.values(state.imgf).some(s=>s.size); }
+
+function heroGroupScore(g){
+  const a=g.tags.applicable_scene||[]; return (a.includes("主图模版")||a.includes("种草模版"))?0:1;
+}
+function heroImgScore(im){ return (im.tags.is_main_hero==="是"||im.tags.is_seeding_hero==="是")?0:1; }
+function mnum(o,k){ return (o.metrics&&o.metrics[k]!=null)?o.metrics[k]:-1; }
+
+function sortGroups(arr){
+  const s=state.sort;
+  arr.sort((a,b)=> s==="ctr"?mnum(b,"ctr")-mnum(a,"ctr")
+    : s==="prod"?mnum(b,"production_count")-mnum(a,"production_count")
+    : s==="name"?a.name.localeCompare(b.name,"zh")
+    : heroGroupScore(a)-heroGroupScore(b)||mnum(b,"ctr")-mnum(a,"ctr"));
+  return arr;
+}
+function sortImgs(arr){
+  const s=state.sort;
+  arr.sort((a,b)=> s==="ctr"?mnum(b,"ctr")-mnum(a,"ctr")
+    : s==="prod"?mnum(b,"production_count")-mnum(a,"production_count")
+    : s==="name"?a.file.localeCompare(b.file,"zh")
+    : heroImgScore(a)-heroImgScore(b)||mnum(b,"ctr")-mnum(a,"ctr"));
+  return arr;
+}
+
+/* ---- render ---- */
+let viewImgs=[]; // current image list for modal nav
+function render(){
+  const groups=DB.groups.filter(groupHit);
+  if(state.scope==="image"){ renderImages(groups); return; }
+  // group / mixed: 组需满足图组级；若有图片级筛选，组内至少1张命中
+  let gs=groups.filter(g=> !anyImgFilter() || g.images.some(imgHit));
+  gs=sortGroups([...gs]);
+  const imgTotal=gs.reduce((n,g)=>n+g.images.length,0);
+  $("#stat").innerHTML=`<b>${gs.length}</b> 个图组 · <b>${imgTotal}</b> 张图`+
+    (state.scope==="mixed"&&anyImgFilter()?` <span style="color:var(--accent)">（含命中图片高亮）</span>`:``);
+  if(!gs.length){ return showEmpty(); }
+  const cls=state.view==="agg"?"agg":"tileG";
+  $("#results").innerHTML=`<div class="grid ${cls}">`+gs.map(g=>groupCard(g)).join("")+`</div>`;
+}
+function renderImages(groups){
+  let imgs=[];
+  groups.forEach(g=> g.images.filter(imgHit).forEach(im=> imgs.push({...im,_g:g})));
+  imgs=sortImgs(imgs); viewImgs=imgs;
+  $("#stat").innerHTML=`<b>${imgs.length}</b> 张图片 · 来自 <b>${new Set(imgs.map(i=>i._g.group_id)).size}</b> 个图组`;
+  if(!imgs.length){ return showEmpty(); }
+  $("#results").innerHTML=`<div class="grid tileI">`+imgs.map((im,i)=>imgCard(im,i)).join("")+`</div>`;
+}
+function showEmpty(){
+  $("#results").innerHTML=`<div class="empty"><div class="big">🔍</div>没有匹配的结果，试试减少筛选条件。</div>`;
+}
+
+function catColor(c){return `var(--cat-${c},#555)`;}
+function fmtCtr(v){return v==null?null:(v*100).toFixed(1)+"%";}
+function metricLine(m){
+  const parts=[];
+  if(m){
+    if(m.ctr!=null)parts.push(`CTR <b>${fmtCtr(m.ctr)}</b>`);
+    if(m.sa_grade_avg)parts.push(`SA <b>${m.sa_grade_avg}</b>`);
+    if(m.production_count!=null)parts.push(`生产 <b>${m.production_count}</b>`);
+  }
+  return parts.length?parts.join(""):`<span style="color:#b6bcc8">效果数据暂无</span>`;
+}
+function imgBadges(im){
+  let b="";
+  if(im.tags.is_main_hero==="是")b+=`<span class="badge main">主图</span>`;
+  if(im.tags.is_seeding_hero==="是")b+=`<span class="badge seed">种草</span>`;
+  return b?`<div class="badges">${b}</div>`:"";
+}
+function groupCard(g){
+  const sch=schemaFor(g.category).group_level;
+  const vals=[];
+  for(const k in sch){ let v=g.tags[k]; if(v==null)continue; if(!Array.isArray(v))v=[v];
+    v.forEach(x=>vals.push({x,scene:k==="applicable_scene"})); }
+  const tagSum=vals.slice(0,4).map(o=>`<span class="t ${o.scene?'g':''}">${o.x}</span>`).join("");
+  const mini=state.view==="tile"
+    ? `<div class="mini">${g.images.slice(0,3).map(i=>`<img src="${i.file}" loading="lazy">`).join("")}</div>` : "";
+  return `<div class="card" onclick="openGroup('${g.group_id}')">
+    <div class="thumb">
+      <span class="catflag" style="background:${catColor(g.category)}">${g.category}</span>
+      <img src="${g.cover_file}" loading="lazy" alt="">${mini}
+    </div>
+    <div class="cbody">
+      <div class="cname">${g.name}</div>
+      <div class="ctags">${tagSum}</div>
+      <div class="cmeta"><span>${g.image_count} 张</span>${metricLine(g.metrics)
+        .split("").length?`<span>${metricLine(g.metrics)}</span>`:""}</div>
+    </div></div>`;
+}
+function imgCard(im,i){
+  const skip=new Set(["是","否","适合","不适合"]);
+  const desc=Object.values(im.tags).filter(v=>v&&!skip.has(v));
+  const keys=desc.slice(0,3).map(t=>`<span class="t">${t}</span>`).join("");
+  return `<div class="card" onclick="openImageByIndex(${i})">
+    <div class="thumb">
+      <span class="catflag" style="background:${catColor(im._g.category)}">${im._g.category}</span>
+      ${imgBadges(im)}
+      <img src="${im.file}" loading="lazy" alt="">
+    </div>
+    <div class="cbody"><div class="ctags">${keys||'<span class="t" style="background:#f0f0f0;color:#999">待补全</span>'}</div>
+      <div class="cmeta">${metricLine(im.metrics)}</div></div></div>`;
+}
+
+/* ---- group detail (reuse modal-ish full page) ---- */
+function openGroup(gid){
+  const g=DB.groups.find(x=>x.group_id===gid);
+  const D=schemaFor(g.category).group_level;
+  const gtags=Object.keys(D).map(k=>{
+    let v=g.tags[k]; if(v==null)v=[]; if(!Array.isArray(v))v=[v];
+    return v.length?`<div class="row"><span>${D[k].label}</span><span>${v.join("、")}</span></div>`:
+      `<div class="row"><span>${D[k].label}</span><span class="na">待补全</span></div>`;
+  }).join("");
+  viewImgs=g.images.map(im=>({...im,_g:g}));
+  const tiles=viewImgs.map((im,i)=>imgCard(im,i)).join("");
+  $("#results").innerHTML=
+   `<div style="margin-bottom:14px"><span class="btn-clear" onclick="render()">← 返回列表</span></div>
+    <div style="display:flex;gap:20px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);
+      border-radius:14px;padding:18px;box-shadow:var(--shadow);margin-bottom:18px">
+      <div style="width:220px;flex:none"><div class="thumb" style="border-radius:10px;overflow:hidden">
+        <span class="catflag" style="background:${catColor(g.category)}">${g.category}</span>
+        <img src="${g.cover_file}"></div></div>
+      <div style="flex:1;min-width:240px">
+        <h2 style="margin:0 0 6px">${g.name}</h2>
+        <div style="color:var(--sub);font-size:13px;margin-bottom:12px">
+          模特：${g.model_name||'—'} ${g.model_type?'('+g.model_type+')':''} ｜ 场景：${g.scene_desc||'—'}</div>
+        ${gtags}
+        <div class="mmetrics">${groupMetricsTable(g.metrics)}</div>
+      </div>
+    </div>
+    <div class="stat" style="margin-bottom:10px">组内图片 <b>${g.images.length}</b> 张</div>
+    <div class="grid tileI">${tiles}</div>`;
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function groupMetricsTable(m){
+  const f=[["生产使用次数",m&&m.production_count],["审核通过率",m&&m.review_pass_rate!=null?(m.review_pass_rate*100).toFixed(0)+"%":null],
+    ["上线应用次数",m&&m.online_count],["CTR",fmtCtr(m&&m.ctr)],["SA档位",m&&m.sa_grade_avg]];
+  return f.map(([k,v])=>`<div class="row"><span>${k}</span>${v!=null&&v!==''?`<span>${v}</span>`:'<span class="na">暂无</span>'}</div>`).join("");
+}
+
+/* ---- image modal ---- */
+let curIdx=0;
+function openImageByIndex(i){curIdx=i;showModal();}
+function showModal(){
+  const im=viewImgs[curIdx]; if(!im)return;
+  $("#mImg").src=im.file;
+  const D=schemaFor(im._g.category).image_level;
+  const rows=Object.keys(D).map(k=>{
+    const v=im.tags[k];
+    const star=(k==="is_main_hero"&&v==="是")?" ⭐":(k==="is_seeding_hero"&&v==="是")?" ⭐":"";
+    return `<div class="row"><span>${D[k].label}</span>${v?`<span>${v}${star}</span>`:'<span class="na">待补全</span>'}</div>`;
+  }).join("");
+  $("#mSide").innerHTML=
+   `<h3>${im.file.split("/").pop()}</h3>
+    <div class="grp" onclick="closeModal();openGroup('${im._g.group_id}')">所属图组：${im._g.name} →</div>
+    ${rows}
+    <div class="mmetrics">${groupMetricsTable(im.metrics)}</div>
+    <div class="mact">
+      <button class="copy" onclick="copyPath('${im.file.replace(/'/g,"\\'")}')">复制路径</button>
+      <button class="close" onclick="closeModal()">关闭</button>
+    </div>
+    <div style="color:var(--sub);font-size:11px;margin-top:10px;word-break:break-all">${im.file}</div>`;
+  $("#modal").classList.add("show");
+}
+function step(d){curIdx=(curIdx+d+viewImgs.length)%viewImgs.length;showModal();}
+function closeModal(){$("#modal").classList.remove("show");}
+function copyPath(p){
+  navigator.clipboard?.writeText(p).then(()=>toast("已复制路径，可作为 AI 拍摄 reference"),
+    ()=>fallbackCopy(p));
+}
+function fallbackCopy(p){const t=document.createElement("textarea");t.value=p;document.body.appendChild(t);
+  t.select();try{document.execCommand("copy");toast("已复制路径");}catch(e){toast("复制失败，请手动选择");}t.remove();}
+let toastT;
+function toast(m){const e=$("#toast");e.textContent=m;e.classList.add("show");
+  clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove("show"),1800);}
+document.addEventListener("keydown",e=>{
+  if(!$("#modal").classList.contains("show"))return;
+  if(e.key==="Escape")closeModal();if(e.key==="ArrowLeft")step(-1);if(e.key==="ArrowRight")step(1);
+});
+$("#modal").addEventListener("click",e=>{if(e.target.id==="modal")closeModal();});
+
+/* ===== 新增图组（本地服务上传） ===== */
+const SERVER = location.protocol.indexOf("http")===0;
+let up = null;
+function openUpload(){
+  up = { category:(state.category!=="全部"?state.category:"童装"), gtags:{}, images:[] };
+  const s = schemaFor(up.category);
+  Object.keys(s.group_level).forEach(k=> up.gtags[s.group_level[k].label]=new Set());
+  renderUpload(); window.scrollTo({top:0,behavior:"smooth"});
+}
+function upSetCat(c){
+  up.category=c; const s=schemaFor(c); up.gtags={};
+  Object.keys(s.group_level).forEach(k=> up.gtags[s.group_level[k].label]=new Set());
+  up.images.forEach(im=>im.tags={}); renderUpload();
+}
+function upTag(label,v,multi){
+  const sel=up.gtags[label]; if(multi){ sel.has(v)?sel.delete(v):sel.add(v);} else { sel.clear(); sel.add(v);} renderUpload();
+}
+function upName(){
+  const g=up.gtags, f=l=>{const s=g[l];return s&&s.size?[...s][0]:"";};
+  const age=(f("年龄段")||"").replace(/\(.*?\)/,"");
+  let p=[f("模特人种"),age,f("拍摄形式"),f("拍摄风格")].filter(Boolean);
+  if(!p.length){ for(const l of ["拍摄风格","拍摄场地","模特风格"]){ if(f(l)){p.push(f(l));break;} } }
+  return p.join("·")||"（先选图组级标签）";
+}
+function upFiles(files){
+  [...files].forEach(file=>{ if(!file.type.startsWith("image/"))return;
+    const r=new FileReader(); r.onload=e=>{ up.images.push({file:file.name,dataURL:e.target.result,tags:{}}); renderUpload(); };
+    r.readAsDataURL(file); });
+}
+function upSetImg(i,label,v){ if(v)up.images[i].tags[label]=v; else delete up.images[i].tags[label]; refreshSubmit(); }
+function upRemove(i){ up.images.splice(i,1); renderUpload(); }
+function upApplyAll(){ if(!up.images.length)return; const t={...up.images[0].tags}; up.images.forEach(im=>im.tags={...t}); renderUpload(); }
+function upReady(s){
+  for(const k in s.group_level){ if(!up.gtags[s.group_level[k].label].size) return false; }
+  if(!up.images.length) return false;
+  for(const im of up.images){ for(const k in s.image_level){ if(!im.tags[s.image_level[k].label]) return false; } }
+  return true;
+}
+function upWhyNot(s){
+  if(!SERVER) return "请通过 工具/启动模板库.py 给出的网址打开本页";
+  for(const k in s.group_level){ if(!up.gtags[s.group_level[k].label].size) return "图组级标签需全部选择"; }
+  if(!up.images.length) return "请添加图片";
+  for(const im of up.images){ for(const k in s.image_level){ if(!im.tags[s.image_level[k].label]) return "每张图的标签需打全（红框处未选）"; } }
+  return "已就绪，可提交";
+}
+function refreshSubmit(){
+  const s=schemaFor(up.category), b=document.querySelector(".upsubmit button"), w=document.querySelector(".upsubmit .why");
+  if(b) b.disabled=!(upReady(s)&&SERVER);
+  if(w) w.textContent=upWhyNot(s);
+  document.querySelectorAll(".upcard").forEach((card,i)=>{
+    card.querySelectorAll("select").forEach(sel=>{ sel.classList.toggle("bad", !sel.value); });
+  });
+}
+function upImgCard(im,i,s){
+  const sels=Object.keys(s.image_level).map(k=>{ const m=s.image_level[k], cur=im.tags[m.label]||"";
+    return `<label class="il">${m.label}<select class="${cur?'':'bad'}" onchange="upSetImg(${i},'${m.label}',this.value)"><option value="">—</option>`+
+      m.values.map(v=>`<option ${v===cur?'selected':''}>${v}</option>`).join("")+`</select></label>`;
+  }).join("");
+  return `<div class="upcard"><span class="rm" onclick="upRemove(${i})">移除</span><img src="${im.dataURL}"><div class="ilgrid">${sels}</div></div>`;
+}
+function renderUpload(){
+  const s=schemaFor(up.category);
+  let h=`<div class="up"><div class="uphd"><h2>＋ 新增图组 · 上传图片组</h2><span class="btn-clear" onclick="render()">← 返回浏览</span></div>`;
+  if(!SERVER) h+=`<div class="warn">当前是双击打开（file://），浏览器不能直接落盘。请运行 <b>工具/启动模板库.py</b>，用它给出的 http 网址打开本页后再上传。</div>`;
+  h+=`<div class="uprow"><label>类目</label><select onchange="upSetCat(this.value)">`+
+     DB.meta.categories.map(c=>`<option ${c===up.category?'selected':''}>${c}</option>`).join("")+
+     `</select><span class="schemaTag">${up.category==="童装"?"童装专属标签":"通用标签（待定义）"}</span></div>`;
+  h+=`<div class="sec-label">图组级标签（必填 · 决定命名与归类）</div>`;
+  for(const k in s.group_level){ const m=s.group_level[k], sel=up.gtags[m.label];
+    h+=`<div class="uprow"><label>${m.label}${m.multi?'<i>多选</i>':''}</label><div class="chips">`+
+      m.values.map(v=>`<span class="opt ${sel.has(v)?'on':''}" onclick="upTag('${m.label}','${v}',${m.multi})">${v}</span>`).join("")+`</div></div>`;
+  }
+  h+=`<div class="uprow"><label>图组名预览</label><b class="upname">${upName()}</b></div>`;
+  h+=`<div class="sec-label">图片（必填 · 每张需打全标，红框=未选）</div>`;
+  h+=`<div class="drop" id="drop">拖拽图片到这里，或 <label class="pick">选择文件<input type="file" accept="image/*" multiple style="display:none" onchange="upFiles(this.files)"></label></div>`;
+  if(up.images.length){
+    h+=`<div class="uptools"><span class="btn-clear" onclick="upApplyAll()">把第①张的标签套用到全部</span><span style="color:var(--sub)">共 ${up.images.length} 张</span></div>`;
+    h+=`<div class="upimgs">`+up.images.map((im,i)=>upImgCard(im,i,s)).join("")+`</div>`;
+  }
+  const ready=upReady(s);
+  h+=`<div class="upsubmit"><button class="copy" style="background:${ready&&SERVER?'var(--ok)':''}" ${ready&&SERVER?'':'disabled'} onclick="upSubmit()">提交入库</button><span class="why">${upWhyNot(s)}</span></div></div>`;
+  $("#results").innerHTML=h;
+  const dz=$("#drop");
+  if(dz){ ["dragover","dragenter"].forEach(e=>dz.addEventListener(e,ev=>{ev.preventDefault();dz.classList.add("over");}));
+    ["dragleave"].forEach(e=>dz.addEventListener(e,ev=>{ev.preventDefault();dz.classList.remove("over");}));
+    dz.addEventListener("drop",ev=>{ev.preventDefault();dz.classList.remove("over");upFiles(ev.dataTransfer.files);}); }
+}
+async function upSubmit(){
+  const s=schemaFor(up.category);
+  if(!upReady(s)){ alert("还有必填项未完成："+upWhyNot(s)); return; }
+  const gt={}; for(const l in up.gtags) gt[l]=[...up.gtags[l]];
+  const payload={ category:up.category, model_type:(up.category==="童装"?"童模":""), group_tags:gt,
+    images: up.images.map(im=>({filename:im.file, data_base64:im.dataURL, tags:im.tags})) };
+  const btn=document.querySelector(".upsubmit button"); btn.disabled=true; btn.textContent="上传中…";
+  try{
+    const r=await fetch("/api/add-group",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+    const j=await r.json();
+    if(j.ok){ alert("✅ 已新增图组："+j.group_name+"（"+j.image_count+" 张）"); location.reload(); }
+    else { alert("失败："+(j.error||"未知")); btn.disabled=false; btn.textContent="提交入库"; }
+  }catch(e){ alert("上传出错："+e+"\n请确认是通过 启动模板库.py 的网址打开的本页。"); btn.disabled=false; btn.textContent="提交入库"; }
+}
+</script>
+</body>
+</html>

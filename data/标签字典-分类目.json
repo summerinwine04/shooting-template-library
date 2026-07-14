@@ -1,0 +1,58 @@
+{
+  "_说明": "按类目独立的标签体系（canonical）。schemaFor(类目)=该类目 confirmed schema；若 pending 则回退到 schemas.通用。四类目确认后此文件即全部生效。",
+  "categories": ["男装", "女装", "运动", "童装"],
+  "schemas": {
+    "童装": {
+      "status": "confirmed",
+      "confirmed_at": "2026-06-16",
+      "group_level": {
+        "shooting_style":    {"label": "拍摄风格", "multi": true, "values": ["清新自然", "活泼开朗", "生活随拍", "童趣可爱", "节日主题"]},
+        "shooting_form":     {"label": "拍摄形式", "multi": true, "values": ["棚拍", "户外专业外拍", "室内场景", "生活种草拍"]},
+        "age_group":         {"label": "年龄段", "multi": true, "values": ["婴幼(0-3)", "小童(3-6)", "中童(6-9)", "大童(9-14)"]},
+        "gender":            {"label": "性别", "multi": true, "values": ["男童", "女童", "中性"]},
+        "model_ethnicity":   {"label": "模特人种", "multi": true, "values": ["亚洲人", "欧美人"]},
+        "model_style":       {"label": "模特风格", "multi": true, "values": ["可爱甜美", "活泼动感", "酷帅潮", "文艺乖巧"]},
+        "appearance_form":   {"label": "出镜形式", "multi": true, "values": ["单人", "亲子同框", "多童"]},
+        "applicable_scene":  {"label": "适用场景", "multi": true, "values": ["种草模版", "主图模版"]}
+      },
+      "image_level": {
+        "is_seeding_hero":    {"label": "种草首图", "multi": false, "values": ["是", "否"]},
+        "is_main_hero":       {"label": "主图首图", "multi": false, "values": ["是", "否"]},
+        "is_outfit_ref":      {"label": "搭配参考", "multi": false, "values": ["是", "否"]},
+        "pose_ref_usable":    {"label": "姿势参考", "multi": false, "values": ["适合", "不适合"]},
+        "pose_action":        {"label": "姿势动作", "multi": false, "values": ["站", "坐", "蹲", "趴", "走", "跑", "跳", "卧"]},
+        "action_amplitude":   {"label": "动作幅度", "multi": false, "values": ["大", "中", "小"]},
+        "pose_style":         {"label": "姿势风格", "multi": false, "values": ["自然抓拍", "乖巧静态", "活泼动感", "童趣搞怪"]},
+        "figure_composition": {"label": "人物构图", "multi": false, "values": ["上半身", "下半身", "全身"]},
+        "shot_type":          {"label": "构图类型", "multi": false, "values": ["远景", "近景", "特写"]},
+        "outfit_angle":       {"label": "展示角度", "multi": false, "values": ["正面", "正侧面", "背侧面", "背面", "侧面"]},
+        "expression":         {"label": "表情", "multi": false, "values": ["微笑", "大笑", "自然", "酷脸"]}
+      }
+    },
+    "通用": {
+      "status": "fallback",
+      "_note": "男装/女装/运动 暂用，待逐类目确认后替换",
+      "group_level": {
+        "shooting_style":    {"label": "拍摄风格", "multi": true, "values": ["清新自然", "高级严肃", "活泼开朗", "生活随拍"]},
+        "shooting_location": {"label": "拍摄场地", "multi": true, "values": ["户外", "室内", "无影棚"]},
+        "model_style":       {"label": "模特风格", "multi": true, "values": ["性感", "可爱", "冷淡", "动感"]},
+        "applicable_scene":  {"label": "适用场景", "multi": true, "values": ["种草模版", "主图模版"]}
+      },
+      "image_level": {
+        "is_seeding_hero":    {"label": "种草首图", "multi": false, "values": ["是", "否"]},
+        "is_main_hero":       {"label": "主图首图", "multi": false, "values": ["是", "否"]},
+        "is_outfit_ref":      {"label": "搭配参考", "multi": false, "values": ["是", "否"]},
+        "pose_ref_usable":    {"label": "姿势参考", "multi": false, "values": ["适合", "不适合"]},
+        "pose_action":        {"label": "姿势动作", "multi": false, "values": ["不适合", "站", "坐", "卧", "跑", "走"]},
+        "action_amplitude":   {"label": "动作幅度", "multi": false, "values": ["不适合", "大", "中", "小"]},
+        "pose_style":         {"label": "姿势风格", "multi": false, "values": ["不适合", "冷静内敛", "清新自然", "动感活泼", "慵懒自在", "性感曲线"]},
+        "figure_composition": {"label": "人物构图", "multi": false, "values": ["上半身", "下半身", "全身"]},
+        "shot_type":          {"label": "构图类型", "multi": false, "values": ["远景", "近景", "特写"]},
+        "outfit_angle":       {"label": "服装角度", "multi": false, "values": ["正面", "微侧", "侧面", "背面"]}
+      }
+    },
+    "男装": {"status": "pending", "group_level": {}, "image_level": {}},
+    "女装": {"status": "pending", "group_level": {}, "image_level": {}},
+    "运动": {"status": "pending", "group_level": {}, "image_level": {}}
+  }
+}

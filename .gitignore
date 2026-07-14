@@ -1,0 +1,30 @@
+# OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Excel 临时锁文件（打开 xlsx 时 Windows 会生成）
+~$*.xlsx
+~$*.xls
+
+# 编辑器
+.vscode/
+.idea/
+
+# 备份
+*.bak
+index.backup.html
+
+# 说明：
+# data/templates-data.js 与 .json 是由 工具/rebuild_manifest.py 生成的，
+# 但仍然提交进仓库 —— 这样别人 clone 下来双击 index.html 就能直接看，
+# 不必先跑一遍重建。如果你不想提交生成物，把下面两行取消注释即可。
+# data/templates-data.js
+# data/templates-data.json

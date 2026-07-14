@@ -1,0 +1,150 @@
+{
+  "categories": [
+    "男装",
+    "女装",
+    "运动",
+    "童装"
+  ],
+  "group_level": {
+    "shooting_style": {
+      "label": "拍摄风格",
+      "multi": true,
+      "values": [
+        "清新自然",
+        "高级严肃",
+        "活泼开朗",
+        "生活随拍"
+      ]
+    },
+    "shooting_location": {
+      "label": "拍摄场地",
+      "multi": true,
+      "values": [
+        "户外",
+        "室内",
+        "无影棚"
+      ]
+    },
+    "model_style": {
+      "label": "模特风格",
+      "multi": true,
+      "values": [
+        "性感",
+        "可爱",
+        "冷淡",
+        "动感"
+      ]
+    },
+    "applicable_scene": {
+      "label": "适用场景",
+      "multi": true,
+      "values": [
+        "种草模版",
+        "主图模版"
+      ]
+    }
+  },
+  "image_level": {
+    "is_seeding_hero": {
+      "label": "种草首图",
+      "multi": false,
+      "values": [
+        "是",
+        "否"
+      ]
+    },
+    "is_main_hero": {
+      "label": "主图首图",
+      "multi": false,
+      "values": [
+        "是",
+        "否"
+      ]
+    },
+    "is_outfit_ref": {
+      "label": "搭配参考",
+      "multi": false,
+      "values": [
+        "是",
+        "否"
+      ]
+    },
+    "pose_ref_usable": {
+      "label": "姿势参考",
+      "multi": false,
+      "values": [
+        "适合",
+        "不适合"
+      ]
+    },
+    "pose_action": {
+      "label": "姿势动作",
+      "multi": false,
+      "values": [
+        "不适合",
+        "站",
+        "坐",
+        "卧",
+        "跑",
+        "走"
+      ]
+    },
+    "action_amplitude": {
+      "label": "动作幅度",
+      "multi": false,
+      "values": [
+        "不适合",
+        "大",
+        "中",
+        "小"
+      ]
+    },
+    "pose_style": {
+      "label": "姿势风格",
+      "multi": false,
+      "values": [
+        "不适合",
+        "冷静内敛",
+        "清新自然",
+        "动感活泼",
+        "慵懒自在",
+        "性感曲线"
+      ]
+    },
+    "figure_composition": {
+      "label": "人物构图",
+      "multi": false,
+      "values": [
+        "上半身",
+        "下半身",
+        "全身"
+      ]
+    },
+    "shot_type": {
+      "label": "构图类型",
+      "multi": false,
+      "values": [
+        "远景",
+        "近景",
+        "特写"
+      ]
+    },
+    "outfit_angle": {
+      "label": "服装角度",
+      "multi": false,
+      "values": [
+        "正面",
+        "微侧",
+        "侧面",
+        "背面"
+      ]
+    }
+  },
+  "metrics": {
+    "production_count": "生产使用次数",
+    "review_pass_rate": "审核通过率",
+    "online_count": "上线应用次数",
+    "ctr": "CTR",
+    "sa_grade_avg": "SA档位"
+  }
+}
